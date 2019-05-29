@@ -4135,24 +4135,27 @@ CloseInternal(RTMP *r, int reconnect)
   int i;
 
   if (RTMP_IsConnected(r))
-    {
+  {
+    if(!r->m_bIsClosing) {
+      r->m_bIsClosing = 1;
       if (r->m_stream_id > 0)
-        {
-	  i = r->m_stream_id;
-	  r->m_stream_id = 0;
-          if ((r->Link.protocol & RTMP_FEATURE_WRITE))
-	    SendFCUnpublish(r);
-	  SendDeleteStream(r, i);
-	}
+      {
+        i = r->m_stream_id;
+        r->m_stream_id = 0;
+              if ((r->Link.protocol & RTMP_FEATURE_WRITE))
+          SendFCUnpublish(r);
+        SendDeleteStream(r, i);
+      }
       if (r->m_clientID.av_val)
-        {
-	  HTTP_Post(r, RTMPT_CLOSE, "", 1);
-	  free(r->m_clientID.av_val);
-	  r->m_clientID.av_val = NULL;
-	  r->m_clientID.av_len = 0;
-	}
-      RTMPSockBuf_Close(&r->m_sb);
+      {
+        HTTP_Post(r, RTMPT_CLOSE, "", 1);
+        free(r->m_clientID.av_val);
+        r->m_clientID.av_val = NULL;
+        r->m_clientID.av_len = 0;
+      }
     }
+    RTMPSockBuf_Close(&r->m_sb);
+  }
 
   r->m_stream_id = -1;
   r->m_sb.sb_socket = -1;

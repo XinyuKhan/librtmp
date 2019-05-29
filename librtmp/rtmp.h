@@ -280,6 +280,8 @@ extern "C"
     RTMPPacket m_write;
     RTMPSockBuf m_sb;
     RTMP_LNK Link;
+
+    uint8_t m_bIsClosing;
   } RTMP;
 
   int RTMP_ParseURL(const char *url, int *protocol, AVal *host,
